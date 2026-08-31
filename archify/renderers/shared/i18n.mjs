@@ -349,6 +349,8 @@ const MESSAGE_PAIRS = {
   'viewer.passport.close': ['Close semantic passport', '关闭语义护照'],
   'viewer.passport.copy': ['Copy link', '复制链接'],
   'viewer.passport.copy.focus': ['Copy link to focused node', '复制聚焦节点的链接'],
+  'viewer.passport.detailLink': ['Detail', '详情'],
+  'viewer.passport.detailLink.open': ['Open the authored detail artifact: {label}', '打开编写的详情制品：{label}'],
   'viewer.passport.relations': ['Relations', '关系'],
   'viewer.passport.relations.show': ['Show connected relationships', '显示关联关系'],
   'viewer.passport.relations.hide': ['Hide connected relationships', '隐藏关联关系'],

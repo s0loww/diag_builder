@@ -8,19 +8,38 @@
       "pattern": "^[a-zA-Z][a-zA-Z0-9_-]*$"
     },
     "locale": {
-      "enum": ["en", "zh-CN"]
+      "enum": [
+        "en",
+        "zh-CN"
+      ]
     },
     "animation": {
-      "enum": ["trace", "none"]
+      "enum": [
+        "trace",
+        "none"
+      ]
     },
     "visualPreset": {
-      "enum": ["classic", "signal-flow", "blueprint", "editorial"]
+      "enum": [
+        "classic",
+        "signal-flow",
+        "blueprint",
+        "editorial"
+      ]
     },
     "qualityProfile": {
-      "enum": ["standard", "showcase"]
+      "enum": [
+        "standard",
+        "showcase"
+      ]
     },
     "side": {
-      "enum": ["left", "right", "top", "bottom"]
+      "enum": [
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ]
     },
     "relationshipWidth": {
       "type": "number",
@@ -29,15 +48,27 @@
     "point": {
       "type": "array",
       "prefixItems": [
-        { "type": "number" },
-        { "type": "number" }
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
       ],
       "items": false,
       "minItems": 2,
       "maxItems": 2
     },
     "componentType": {
-      "enum": ["frontend", "backend", "database", "cloud", "security", "messagebus", "external"]
+      "enum": [
+        "frontend",
+        "backend",
+        "database",
+        "cloud",
+        "security",
+        "messagebus",
+        "external"
+      ]
     },
     "brandMark": {
       "oneOf": [
@@ -46,34 +77,65 @@
           "minLength": 1,
           "maxLength": 2048,
           "anyOf": [
-            { "maxLength": 80, "pattern": "^[^\\r\\n]+$" },
-            { "pattern": "^https?://" }
+            {
+              "maxLength": 80,
+              "pattern": "^[^\\r\\n]+$"
+            },
+            {
+              "pattern": "^https?://"
+            }
           ]
         },
         {
           "type": "object",
           "additionalProperties": false,
-          "required": ["url", "sha256"],
+          "required": [
+            "url",
+            "sha256"
+          ],
           "properties": {
-            "url": { "type": "string", "minLength": 8, "maxLength": 2048, "pattern": "^https?://" },
-            "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            "url": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 2048,
+              "pattern": "^https?://"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
           }
         }
       ]
     },
     "variant": {
-      "enum": ["default", "emphasis", "security", "dashed"]
+      "enum": [
+        "default",
+        "emphasis",
+        "security",
+        "dashed"
+      ]
     },
     "legendMode": {
-      "enum": ["auto", "all", "hidden"]
+      "enum": [
+        "auto",
+        "all",
+        "hidden"
+      ]
     },
     "legendEntry": {
       "type": "object",
       "additionalProperties": false,
       "minProperties": 1,
       "properties": {
-        "label": { "type": "string", "minLength": 1, "maxLength": 80 },
-        "visible": { "type": "boolean" }
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "visible": {
+          "type": "boolean"
+        }
       }
     },
     "guidedViews": {
@@ -82,16 +144,31 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "label", "focus"],
+        "required": [
+          "id",
+          "label",
+          "focus"
+        ],
         "properties": {
-          "id": { "$ref": "#/$defs/id" },
-          "label": { "type": "string", "minLength": 1, "maxLength": 48 },
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 48
+          },
           "focus": {
             "type": "array",
             "minItems": 1,
-            "items": { "$ref": "#/$defs/id" }
+            "items": {
+              "$ref": "#/$defs/id"
+            }
           },
-          "note": { "type": "string", "maxLength": 140 }
+          "note": {
+            "type": "string",
+            "maxLength": 140
+          }
         }
       }
     },
@@ -100,14 +177,53 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["dot", "title", "items"],
+        "required": [
+          "dot",
+          "title",
+          "items"
+        ],
         "properties": {
-          "dot": { "enum": ["cyan", "emerald", "violet", "amber", "rose", "orange", "slate"] },
-          "title": { "type": "string", "minLength": 1 },
+          "dot": {
+            "enum": [
+              "cyan",
+              "emerald",
+              "violet",
+              "amber",
+              "rose",
+              "orange",
+              "slate"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
           "items": {
             "type": "array",
-            "items": { "type": "string" }
+            "items": {
+              "type": "string"
+            }
           }
+        }
+      }
+    },
+    "nodeLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "href"
+      ],
+      "properties": {
+        "href": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?:https://[^\\s'\"]+|[A-Za-z0-9._~%+-]+(?:/[A-Za-z0-9._~%+-]+)*\\.html(?:#[A-Za-z0-9._~%=&+-]*)?)$"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 48
         }
       }
     }

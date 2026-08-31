@@ -1685,6 +1685,30 @@
       gap: 0.18rem;
     }
     .relationship-lens-actions button { white-space: nowrap; }
+    /* Detail Link. One authored hop from a node to the artifact that details it.
+       Styled as a passport action, never as verified repository evidence: the
+       target is an authored sibling artifact, not a revision-checked source. */
+    .semantic-passport-detail-link {
+      max-width: 12rem;
+      overflow: hidden;
+      padding: 0.16rem 0.4rem;
+      border: 1px solid color-mix(in srgb, var(--cloud-stroke) 45%, var(--toolbar-border));
+      border-radius: 0.4rem;
+      color: var(--cloud-stroke);
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .semantic-passport-detail-link[hidden] { display: none; }
+    .semantic-passport-detail-link:hover,
+    .semantic-passport-detail-link:focus-visible {
+      background: var(--toolbar-hover);
+      color: var(--cloud-stroke);
+    }
+    html[data-preset="blueprint"] .semantic-passport-detail-link { border-radius: 0.1rem; }
     .relationship-lens-actions #btn-focus-clear {
       display: grid;
       width: 1.75rem;
@@ -5263,6 +5287,7 @@
           <div class="relationship-lens-actions">
             <button id="btn-focus-clear" type="button" aria-label="{{i18n:viewer.passport.close}}" title="{{i18n:viewer.common.close}}">&#215;</button>
             <button id="btn-focus-copy" type="button" aria-label="{{i18n:viewer.passport.copy.focus}}">{{i18n:viewer.passport.copy}}</button>
+            <a id="focus-detail-link" class="semantic-passport-detail-link" hidden target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"></a>
             <button id="btn-focus-relations" type="button" aria-label="{{i18n:viewer.passport.relations.show}}" aria-expanded="false" aria-controls="relationship-lens-list">{{i18n:viewer.passport.relations}}</button>
           </div>
         </div>
@@ -7436,6 +7461,7 @@
       var downstreamCount = document.getElementById('focus-reach-downstream-count');
       var relationshipList = document.getElementById('relationship-lens-list');
       var copyBtn = document.getElementById('btn-focus-copy');
+      var detailLink = document.getElementById('focus-detail-link');
       var relationsBtn = document.getElementById('btn-focus-relations');
       var clearBtn = document.getElementById('btn-focus-clear');
       var activeIds = [];
@@ -7778,7 +7804,26 @@
         });
         evidence.hidden = false;
       }
+      function renderDetailLink(node) {
+        if (!detailLink) return;
+        var href = node.getAttribute('data-node-link') || '';
+        if (!href) {
+          detailLink.hidden = true;
+          detailLink.removeAttribute('href');
+          detailLink.removeAttribute('title');
+          detailLink.removeAttribute('aria-label');
+          detailLink.textContent = '';
+          return;
+        }
+        var caption = node.getAttribute('data-node-link-label') || viewerText('viewer.passport.detailLink');
+        detailLink.href = href;
+        detailLink.textContent = caption + ' ↗';
+        detailLink.title = href;
+        detailLink.setAttribute('aria-label', viewerText('viewer.passport.detailLink.open', { label: caption }));
+        detailLink.hidden = false;
+      }
       function renderPassport(id, node) {
+        renderDetailLink(node);
         setPassportValue(detail, node.getAttribute('data-node-sublabel'));
         setPassportValue(kind, viewerKindLabel(node.getAttribute('data-node-kind') || 'node'));
         setPassportValue(context, node.getAttribute('data-node-context'));
@@ -8536,6 +8581,13 @@
         context.hidden = true;
         tag.textContent = '';
         tag.hidden = true;
+        if (detailLink) {
+          detailLink.hidden = true;
+          detailLink.removeAttribute('href');
+          detailLink.removeAttribute('title');
+          detailLink.removeAttribute('aria-label');
+          detailLink.textContent = '';
+        }
         semanticId.textContent = '';
         semanticId.hidden = true;
         evidence.hidden = true;
