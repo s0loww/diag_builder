@@ -11,7 +11,12 @@ GitHub* — блок Repository Evidence требует `meta.repository` с `ht
 с детальной схемой этого узла, локально и без GitHub. Штатного поля для этого
 нет, поэтому оно добавлено здесь.
 
-## Что добавлено: Detail Link
+## Что добавлено
+
+Две вещи: **Detail Link** — переход из паспорта на соседнюю схему, и
+**Description** — раскрывающееся текстовое описание узла.
+
+## Detail Link
 
 Узел получает необязательное поле `link`, и в паспорте под кнопкой `Copy link`
 появляется ссылка на другой артефакт.
@@ -35,16 +40,40 @@ Evidence: та секция означает «источник проверен
 для соседнего html было бы враньём. Detail Link ничего не проверяет — это
 переход, заявленный автором схемы.
 
+## Description
+
+Узел получает необязательное поле `description` — массив от одного до восьми
+абзацев, до 480 символов каждый. В паспорте появляется кнопка `Description`,
+панель свёрнута по умолчанию.
+
+```json
+{ "id": "rule", "type": "security", "label": "Правило ЮФЛ",
+  "description": [
+    "Сторона считается прямо в тексте запросов, в двух местах.",
+    "Правило унаследовано от прежнего контура и дублирование сохранено осознанно."
+  ] }
+```
+
+Абзацы едут в SVG-атрибуте `data-node-description` как JSON-массив: так
+разрывы абзацев переживают round-trip через атрибут, и не нужен разделитель,
+который может встретиться внутри живого предложения. Вьюер разбирает массив,
+непарсящееся значение молча даёт пустое описание и скрытую кнопку. Текст
+вставляется через `textContent` — разметка внутри описания не исполняется.
+
+Кнопка появляется только у узла с описанием; при закрытии паспорта панель
+очищается, состояние раскрытия сбрасывается, `aria-expanded` возвращается в
+`false`.
+
 ## Изменённые файлы
 
 | Файл | Что |
 |---|---|
-| `archify/schemas/common.schema.json` | `$defs.nodeLink` — форма и паттерн `href` |
-| `archify/schemas/{architecture,dataflow,lifecycle,sequence,workflow}.schema.json` | поле `link` у узла |
-| `archify/renderers/shared/cli.mjs` | атрибуты `data-node-link`, `data-node-link-label` в SVG-узле |
-| `archify/renderers/*/render-*.mjs`, `workflow-compiler.mjs` | проброс `link` в паспорт узла |
-| `archify/renderers/shared/i18n.mjs` | ключи `viewer.passport.detailLink*` (en + zh) |
-| `archify/assets/template.html` | разметка `#focus-detail-link`, стиль, заполнение и сброс |
+| `archify/schemas/common.schema.json` | `$defs.nodeLink` (форма и паттерн `href`), `$defs.nodeDescription` |
+| `archify/schemas/{architecture,dataflow,lifecycle,sequence,workflow}.schema.json` | поля `link` и `description` у узла |
+| `archify/renderers/shared/cli.mjs` | атрибуты `data-node-link`, `data-node-link-label`, `data-node-description` в SVG-узле |
+| `archify/renderers/*/render-*.mjs`, `workflow-compiler.mjs` | проброс `link` и `description` в паспорт узла |
+| `archify/renderers/shared/i18n.mjs` | ключи `viewer.passport.detailLink*` и `viewer.passport.description*` (en + zh) |
+| `archify/assets/template.html` | разметка `#focus-detail-link`, `#btn-focus-description`, `#focus-description-panel`, стиль, заполнение, переключение и сброс |
 | `archify/renderers/shared/generated-validators.mjs` | перегенерирован (`npm run generate:validators`) |
 | `examples/*.html`, `archify/examples/*.html` | перерендерены под новый шаблон, как требует golden |
 
@@ -58,6 +87,9 @@ Evidence: та секция означает «источник проверен
   pass, у `bki-sides` visual-check тоже pass.
 - Переход проверен в браузере: ссылка появляется только у узла с `link`,
   у остальных скрыта и атрибуты чисты; клик уводит на соседний артефакт.
+- Описание проверено в браузере: кнопка видна только у узла с `description`,
+  панель свёрнута до клика, раскрывается по нему, при переходе на узел без
+  описания кнопка скрывается и состояние сбрасывается.
 
 Известный дефект апстрима, не связанный с правкой: `npm test` на Windows падает
 на `test/workflow-migration.test.mjs` — дочерний процесс получает абсолютный
@@ -70,5 +102,6 @@ Evidence: та секция означает «источник проверен
 node /d/AI_Projects/diag_builder/archify/bin/archify.mjs deliver architecture <spec>.json <out>.html --quality showcase --json
 ```
 
-Навык в `~/.claude/skills/archify` остался апстримным — он не знает про `link`.
-Схемы со ссылками собирать только этим форком.
+Навык в `~/.claude/skills/archify` остался апстримным — он не знает ни про
+`link`, ни про `description`. Схемы, использующие эти поля, собирать только
+этим форком.

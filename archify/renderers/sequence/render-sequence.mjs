@@ -303,7 +303,7 @@ function renderParticipant(participant) {
     sublabel: participant.sublabel,
     context: i18nText(sequence.meta.locale, 'node.context.sequence'),
     ...brandMetadataFor(participant),
-    link: participant.link ? participant.link.href : undefined, linkLabel: participant.link ? participant.link.label : undefined };
+    link: participant.link ? participant.link.href : undefined, linkLabel: participant.link ? participant.link.label : undefined, description: participant.description };
   return `        <g ${focusNodeAttrs(participant.id, participant.label, passport, sequence.meta.locale)}>
           ${focusNodeTitle(participant.label, passport)}
           <rect x="${participant.x}" y="${layout.topY}" width="${layout.participantW}" height="${layout.participantH}" rx="6" class="c-mask"/>

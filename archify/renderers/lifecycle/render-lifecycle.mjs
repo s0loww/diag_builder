@@ -451,7 +451,7 @@ function renderState(state) {
     tag: state.tag,
     context: laneLabels.get(state.lane) || i18nText(lifecycle.meta.locale, 'node.context.lifecycle'),
     ...brandMetadataFor(state),
-    link: state.link ? state.link.href : undefined, linkLabel: state.link ? state.link.label : undefined };
+    link: state.link ? state.link.href : undefined, linkLabel: state.link ? state.link.label : undefined, description: state.description };
   return `        <g ${focusNodeAttrs(state.id, state.label, passport, lifecycle.meta.locale)}>
           ${focusNodeTitle(state.label, passport)}
           <rect x="${state.x}" y="${state.y}" width="${state.width}" height="${state.height}" rx="7" class="c-mask"/>

@@ -322,6 +322,9 @@
           },
           "link": {
             "$ref": "common.schema.json#/$defs/nodeLink"
+          },
+          "description": {
+            "$ref": "common.schema.json#/$defs/nodeDescription"
           }
         }
       }

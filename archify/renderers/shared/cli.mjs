@@ -179,6 +179,12 @@ export function animateAttr(meta, kind, step) {
 // the schema's conservative identifier pattern; escape again at the markup
 // boundary so these helpers remain safe if that contract expands later.
 export function focusNodeAttrs(id, label, metadata = {}, locale) {
+  // Authored node description travels as a JSON array so paragraph breaks
+  // survive the attribute round-trip without inventing a separator that a
+  // real sentence could contain.
+  const description = Array.isArray(metadata.description) && metadata.description.length
+    ? JSON.stringify(metadata.description)
+    : undefined;
   const optional = [
     ['data-node-kind', metadata.kind],
     ['data-node-sublabel', metadata.sublabel],
@@ -190,6 +196,7 @@ export function focusNodeAttrs(id, label, metadata = {}, locale) {
     ['data-node-brand-source', metadata.brandSource],
     ['data-node-link', metadata.link],
     ['data-node-link-label', metadata.linkLabel],
+    ['data-node-description', description],
   ].filter(([, value]) => value !== undefined && value !== null && String(value).trim() !== '')
     .map(([name, value]) => ` ${name}="${esc(String(value))}"`)
     .join('');

@@ -1703,6 +1703,33 @@
       white-space: nowrap;
     }
     .semantic-passport-detail-link[hidden] { display: none; }
+    /* Description. Authored prose about one node, folded by default so the
+       passport stays a glance surface and never becomes a document. */
+    .relationship-lens-actions #btn-focus-description[hidden] { display: none; }
+    .semantic-passport-description {
+      display: none;
+      max-height: min(16rem, 40vh);
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.55rem;
+      overflow: auto;
+      border: 1px solid color-mix(in srgb, var(--frontend-stroke) 30%, var(--toolbar-border));
+      border-radius: 0.55rem;
+      background: color-mix(in srgb, var(--frontend-fill) 14%, var(--panel));
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      line-height: 1.5;
+      scrollbar-width: thin;
+      scrollbar-color: var(--frontend-stroke) transparent;
+    }
+    .focus-chip[data-description-expanded="true"] .semantic-passport-description { display: block; }
+    html[data-preset="blueprint"] .semantic-passport-description { border-radius: 0.18rem; }
+    .semantic-passport-description p { margin: 0 0 0.42rem; }
+    .semantic-passport-description p:last-child { margin-bottom: 0; }
+    .semantic-passport-description::-webkit-scrollbar { width: 4px; }
+    .semantic-passport-description::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--frontend-stroke) 68%, transparent);
+    }
     .semantic-passport-detail-link:hover,
     .semantic-passport-detail-link:focus-visible {
       background: var(--toolbar-hover);
@@ -5270,6 +5297,7 @@
               </div>
               <div class="semantic-passport-evidence-links" id="focus-evidence-links"></div>
             </div>
+            <div class="semantic-passport-description" id="focus-description-panel" role="region" aria-label="{{i18n:viewer.passport.description}}"></div>
             <span class="relationship-lens-summary" id="focus-summary" aria-live="polite"></span>
             <div class="semantic-passport-reach" id="focus-reach" hidden>
               <span class="semantic-passport-reach-label">{{i18n:viewer.passport.reach}}</span>
@@ -5288,6 +5316,7 @@
             <button id="btn-focus-clear" type="button" aria-label="{{i18n:viewer.passport.close}}" title="{{i18n:viewer.common.close}}">&#215;</button>
             <button id="btn-focus-copy" type="button" aria-label="{{i18n:viewer.passport.copy.focus}}">{{i18n:viewer.passport.copy}}</button>
             <a id="focus-detail-link" class="semantic-passport-detail-link" hidden target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"></a>
+            <button id="btn-focus-description" type="button" hidden aria-expanded="false" aria-controls="focus-description-panel" aria-label="{{i18n:viewer.passport.description.show}}">{{i18n:viewer.passport.description}}</button>
             <button id="btn-focus-relations" type="button" aria-label="{{i18n:viewer.passport.relations.show}}" aria-expanded="false" aria-controls="relationship-lens-list">{{i18n:viewer.passport.relations}}</button>
           </div>
         </div>
@@ -7462,6 +7491,8 @@
       var relationshipList = document.getElementById('relationship-lens-list');
       var copyBtn = document.getElementById('btn-focus-copy');
       var detailLink = document.getElementById('focus-detail-link');
+      var descriptionBtn = document.getElementById('btn-focus-description');
+      var descriptionPanel = document.getElementById('focus-description-panel');
       var relationsBtn = document.getElementById('btn-focus-relations');
       var clearBtn = document.getElementById('btn-focus-clear');
       var activeIds = [];
@@ -7822,8 +7853,44 @@
         detailLink.setAttribute('aria-label', viewerText('viewer.passport.detailLink.open', { label: caption }));
         detailLink.hidden = false;
       }
+      function collapseDescription() {
+        chip.removeAttribute('data-description-expanded');
+        if (!descriptionBtn) return;
+        descriptionBtn.setAttribute('aria-expanded', 'false');
+        descriptionBtn.setAttribute('aria-label', viewerText('viewer.passport.description.show'));
+      }
+      function renderDescription(node) {
+        if (!descriptionBtn || !descriptionPanel) return;
+        collapseDescription();
+        descriptionPanel.textContent = '';
+        var raw = node.getAttribute('data-node-description') || '';
+        var paragraphs = [];
+        if (raw) {
+          try {
+            var parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              paragraphs = parsed.filter(function (entry) {
+                return typeof entry === 'string' && entry.trim() !== '';
+              });
+            }
+          } catch (error) {
+            paragraphs = [];
+          }
+        }
+        if (!paragraphs.length) {
+          descriptionBtn.hidden = true;
+          return;
+        }
+        paragraphs.forEach(function (entry) {
+          var p = document.createElement('p');
+          p.textContent = entry;
+          descriptionPanel.appendChild(p);
+        });
+        descriptionBtn.hidden = false;
+      }
       function renderPassport(id, node) {
         renderDetailLink(node);
+        renderDescription(node);
         setPassportValue(detail, node.getAttribute('data-node-sublabel'));
         setPassportValue(kind, viewerKindLabel(node.getAttribute('data-node-kind') || 'node'));
         setPassportValue(context, node.getAttribute('data-node-context'));
@@ -8588,6 +8655,11 @@
           detailLink.removeAttribute('aria-label');
           detailLink.textContent = '';
         }
+        if (descriptionBtn && descriptionPanel) {
+          collapseDescription();
+          descriptionBtn.hidden = true;
+          descriptionPanel.textContent = '';
+        }
         semanticId.textContent = '';
         semanticId.hidden = true;
         evidence.hidden = true;
@@ -8755,6 +8827,18 @@
       copyBtn.addEventListener('click', copyFocusLink);
       upstreamBtn.addEventListener('click', function () { applyReachability('upstream'); });
       downstreamBtn.addEventListener('click', function () { applyReachability('downstream'); });
+      if (descriptionBtn) {
+        descriptionBtn.addEventListener('click', function () {
+          var expanded = chip.getAttribute('data-description-expanded') === 'true';
+          if (expanded) chip.removeAttribute('data-description-expanded');
+          else chip.setAttribute('data-description-expanded', 'true');
+          descriptionBtn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+          descriptionBtn.setAttribute('aria-label', viewerText(expanded
+            ? 'viewer.passport.description.show'
+            : 'viewer.passport.description.hide'));
+          requestLensPlacement();
+        });
+      }
       relationsBtn.addEventListener('click', function () {
         var expanded = chip.getAttribute('data-relations-expanded') === 'true';
         if (expanded) chip.removeAttribute('data-relations-expanded');
