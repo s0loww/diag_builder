@@ -72,6 +72,32 @@ Read Mermaid for topology and meaning, then author fresh Archify JSON; do not me
 - `sequenceDiagram` → `sequence`; participants become semantic participants and arrows become messages.
 - `stateDiagram` → `lifecycle`; states and transitions retain meaning, not Mermaid style.
 
+## Fork additions: node `link` and `description`
+
+This is the Project_BL fork. Two optional node fields exist here and in no
+upstream release; the schemas accept them on `architecture.components`,
+`dataflow.nodes`, `lifecycle.states`, `sequence.participants`, and
+`workflow.nodes`.
+
+- `link` — `{ "href": "...", "label": "..." }` puts one link in the node's
+  Semantic Passport, under `Copy link`. `href` takes a relative path to a
+  sibling `.html` (an anchor such as `#focus=set` is allowed) or an absolute
+  `https://` URL; other protocols are rejected by the schema pattern. `label`
+  is optional, at most 48 characters, and falls back to `Detail` / `详情`.
+  Use it when a node is detailed by another artifact. It is an authored hop,
+  never verified evidence — do not present it as a checked source, and keep
+  using `sources` plus `meta.repository` when the target really is
+  revision-verified code on public GitHub.
+- `description` — an array of one to eight paragraphs, each at most 480
+  characters, revealed by a `Description` button in the passport. Use it for
+  what a sublabel cannot hold: why a thing is built this way, which behavior
+  is inherited, where the traps are. When the text stops fitting in eight
+  paragraphs the node needs its own diagram and a `link`, not a longer
+  description.
+
+Both fields are optional and additive: a specification that omits them renders
+exactly as upstream would render it.
+
 ## Authoring invariants
 
 - One obvious main path; side branches leave the nearest main-path node. Remove low-value edges before adding routing controls.
